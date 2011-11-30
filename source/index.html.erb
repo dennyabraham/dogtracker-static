@@ -1,5 +1,6 @@
 <script type="text/javascript">
   $(document).ready(function() {
+    paper = Raphael(document.getElementById("map"), 500, 500);
     function drawPosition(x, y, intensity) {
       paper.circle(x, y, 5).attr({'stroke':'#f00', 'stroke-width':intensity});
       paper.circle(x, y, 10).attr({'stroke':'#f00', 'stroke-width':intensity});
@@ -9,8 +10,20 @@
       paper.path("M " + x + " " + y + "l -" + intensity * 10 + " -" + intensity * 10).attr({'stroke':'#f00', 'stroke-width':intensity});
     };
 
-    $.each({}, function(idx, position) {
-      drawPosition(position.x, position.y, (6 - idx) * 0.34);
-    });
+    loadPositions();
+    setInterval(loadPositions, 5000);
+
+    function loadPositions() {
+      $.get('http://dogtracker.herokuapp.com/api/dogs/1/positions/past.json',
+        function(positions) {
+          paper.clear();
+          $.each(positions, function(idx, position) {
+            drawPosition(position.x, position.y, (6 - idx) * 0.34);
+          });
+        },
+        'jsonp'
+      );
+    };
+
   })
 </script>
